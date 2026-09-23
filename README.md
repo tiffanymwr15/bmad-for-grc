@@ -1,6 +1,6 @@
 # BMAD for GRC Engineering
 
-A GRC Engineering Club course on applying the [BMAD method](https://github.com/bmad-code-org/BMAD-METHOD) when agents write controls, evidence, and catalog entries.
+A course Tiffany made for GRC Engineering Club members on applying the [BMAD method](https://github.com/bmad-code-org/BMAD-METHOD) when agents write controls, evidence, and catalog entries.
 
 **Time:** about 90 minutes, or one lesson per meeting. Leave time at the end to try the playbook on a real change.
 
