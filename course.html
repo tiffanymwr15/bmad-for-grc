@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BMAD for GRC Engineering</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: oklch(0.16 0.022 350);
+      --bg-raise: oklch(0.21 0.024 350);
+      --bg-inset: oklch(0.13 0.02 350);
+      --text: oklch(0.94 0.012 350);
+      --text-dim: oklch(0.86 0.016 350);
+      --text-quiet: oklch(0.64 0.022 350);
+      --line: oklch(0.32 0.018 350);
+      --accent: #c9a0b0;
+      --accent-ink: oklch(0.22 0.03 350);
+      --pass: oklch(0.74 0.06 155);
+      --miss: oklch(0.72 0.09 25);
+      --warn: oklch(0.78 0.07 75);
+      --space: 8px;
+      --measure: 68ch;
+      --serif: "Playfair Display", "Iowan Old Style", Palatino, serif;
+      --sans: Inter, "Segoe UI", sans-serif;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16.5px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    button, summary { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 232px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .rail {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 32px 24px;
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      background: var(--bg-inset);
+    }
+
+    .mark {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 15px;
+      letter-spacing: 0.01em;
+      color: var(--accent);
+    }
+
+    .rail h1 {
+      margin: 8px 0 0;
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 28px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .rail nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .lesson-jump {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: baseline;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      padding: 8px 0;
+      border-bottom: 1px solid transparent;
+      color: var(--text-dim);
+    }
+
+    .lesson-jump .num {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 18px;
+      color: var(--text-quiet);
+    }
+
+    .lesson-jump .label {
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .lesson-jump[aria-current="true"] {
+      color: var(--text);
+    }
+
+    .lesson-jump[aria-current="true"] .num { color: var(--accent); }
+
+    .rail-foot {
+      margin-top: auto;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-quiet);
+    }
+
+    .stage {
+      padding: 48px 56px 96px;
+      max-width: 980px;
+    }
+
+    .lesson { display: none; }
+    .lesson.is-active { display: block; }
+
+    .kicker {
+      margin: 0 0 12px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .claim {
+      margin: 0 0 20px;
+      max-width: none;
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: clamp(40px, 5vw, 64px);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+    }
+
+    .claim::after {
+      content: "";
+      display: block;
+      width: 48px;
+      height: 2px;
+      margin-top: 22px;
+      background: var(--accent);
+    }
+
+    .lede {
+      max-width: var(--measure);
+      margin: 0 0 40px;
+      font-size: 18px;
+      line-height: 1.55;
+      color: var(--text-dim);
+    }
+
+    h2 {
+      margin: 48px 0 12px;
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 32px;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    p { max-width: var(--measure); margin: 0 0 14px; }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 40px;
+      align-items: start;
+      margin-top: 8px;
+    }
+
+    .quiet { color: var(--text-dim); }
+
+    .five {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .five li {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .five li:last-child { border-bottom: 1px solid var(--line); }
+
+    .five .n {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 22px;
+      color: var(--accent);
+      line-height: 1.2;
+    }
+
+    .five strong { display: block; font-weight: 600; }
+    .five span { color: var(--text-dim); font-size: 14.5px; }
+
+    .note {
+      margin-top: 28px;
+      max-width: var(--measure);
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--text-dim);
+      font-size: 15px;
+    }
+
+    .diagram {
+      margin: 22px 0 6px;
+      overflow-x: auto;
+    }
+
+    .diagram svg {
+      display: block;
+      min-width: 680px;
+      width: 100%;
+      height: auto;
+      font-family: var(--sans);
+    }
+
+    .diagram figcaption {
+      margin-top: 10px;
+      max-width: 68ch;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text-quiet);
+    }
+
+    .phases {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      margin: 20px 0 0;
+      position: relative;
+    }
+
+    .phases::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: 18px;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .phase {
+      position: relative;
+      background: transparent;
+      border: 0;
+      text-align: left;
+      padding: 0 16px 0 0;
+    }
+
+    .phase .dot {
+      width: 10px;
+      height: 10px;
+      margin: 14px 0 14px 14px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid var(--text-quiet);
+      position: relative;
+      z-index: 1;
+    }
+
+    .phase[aria-pressed="true"] .dot {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .phase .pname {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .phase .pmeta {
+      display: block;
+      margin-top: 4px;
+      font-size: 12.5px;
+      color: var(--text-quiet);
+      line-height: 1.35;
+    }
+
+    .phase-detail {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    .phase-detail .idx {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 42px;
+      line-height: 1;
+      color: var(--accent);
+    }
+
+    .tracks {
+      display: flex;
+      gap: 8px;
+      margin: 16px 0 20px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--text-dim);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .chip[aria-pressed="true"],
+    .chip.next {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-ink);
+      font-weight: 600;
+    }
+
+    .chip.next { margin-top: 28px; }
+
+    .track-body h3 { margin-bottom: 6px; }
+    .when { color: var(--text-dim); margin-bottom: 16px; }
+
+    dl.roles {
+      margin: 12px 0 0;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0 24px;
+    }
+
+    dl.roles dt {
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-quiet);
+    }
+
+    dl.roles dd {
+      margin: 0;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .steps {
+      list-style: none;
+      margin: 8px 0 0;
+      padding: 0 0 0 4px;
+      position: relative;
+    }
+
+    .steps::before {
+      content: "";
+      position: absolute;
+      left: 15px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: var(--line);
+    }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 16px;
+      padding: 0 0 22px;
+      position: relative;
+    }
+
+    .steps .node {
+      width: 12px;
+      height: 12px;
+      margin: 6px 0 0 10px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid var(--accent);
+      position: relative;
+      z-index: 1;
+    }
+
+    .steps li.is-on .node { background: var(--accent); }
+
+    .step-btn {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      text-align: left;
+    }
+
+    .step-btn strong { display: block; font-weight: 600; }
+    .step-btn em {
+      font-style: normal;
+      color: var(--text-quiet);
+      font-size: 13px;
+    }
+
+    .step-copy {
+      margin: 8px 0 0 48px;
+      color: var(--text-dim);
+      max-width: 62ch;
+    }
+
+    .pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 8px;
+    }
+
+    .pair article { padding-top: 12px; border-top: 1px solid var(--line); }
+    .pair .tag {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .stops { display: flex; flex-direction: column; gap: 18px; margin-top: 8px; }
+    .stop {
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+    .stop p { margin-bottom: 10px; }
+    .choices { display: flex; flex-wrap: wrap; gap: 8px; }
+    .feedback {
+      margin: 10px 0 0;
+      font-size: 14.5px;
+      min-height: 1.4em;
+    }
+    .feedback.ok { color: var(--pass); }
+    .feedback.no { color: var(--miss); }
+
+    .checks { margin-top: 8px; }
+    .checks details {
+      border-top: 1px solid var(--line);
+      padding: 12px 0;
+    }
+    .checks details:last-child { border-bottom: 1px solid var(--line); }
+    .checks summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+    }
+    .checks summary::-webkit-details-marker { display: none; }
+    .checks summary .q {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--accent);
+      flex: 0 0 1.5ch;
+    }
+    .checks .answer {
+      margin: 10px 0 4px 28px;
+      color: var(--text-dim);
+      max-width: 68ch;
+    }
+
+    .play {
+      list-style: none;
+      margin: 8px 0 0;
+      padding: 0;
+    }
+    .play li {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+    }
+    .play input { margin-top: 4px; accent-color: #c9a0b0; }
+
+    .roles a { color: var(--accent); }
+
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: 1fr; }
+      .rail {
+        position: sticky;
+        height: auto;
+        z-index: 2;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 16px 16px 12px;
+        gap: 12px;
+      }
+      .rail h1 { font-size: 22px; }
+      .rail nav {
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 16px;
+      }
+      .lesson-jump { grid-template-columns: auto auto; white-space: nowrap; padding: 4px 0; }
+      .rail-foot { display: none; }
+      .stage { padding: 28px 18px 72px; }
+      .split, .pair, .phase-detail, dl.roles { grid-template-columns: 1fr; gap: 16px; }
+      .phases { grid-template-columns: 1fr 1fr; gap: 16px; }
+      .phases::before { display: none; }
+      .claim { max-width: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div>
+        <div class="mark">A short course</div>
+        <h1>BMAD for GRC</h1>
+      </div>
+      <nav aria-label="Lessons">
+        <button class="lesson-jump" type="button" data-go="0" aria-current="true">
+          <span class="num">0</span><span class="label">What BMAD is</span>
+        </button>
+        <button class="lesson-jump" type="button" data-go="1">
+          <span class="num">1</span><span class="label">Why it matters</span>
+        </button>
+        <button class="lesson-jump" type="button" data-go="2">
+          <span class="num">2</span><span class="label">The method</span>
+        </button>
+        <button class="lesson-jump" type="button" data-go="3">
+          <span class="num">3</span><span class="label">Apply it</span>
+        </button>
+        <button class="lesson-jump" type="button" data-go="4">
+          <span class="num">4</span><span class="label">The human loop</span>
+        </button>
+      </nav>
+      <p class="rail-foot">Start with the definition. Then four lessons on applying it to controls, evidence, and the people who own them.</p>
+    </aside>
+
+    <main class="stage">
+      <article class="lesson is-active" id="lesson-0" data-lesson="0">
+        <p class="kicker">Start here</p>
+        <h2 class="claim">Decide first.<br>Then let<br>the agent build.</h2>
+        <p class="lede">BMAD is the Breakthrough Method for Agile AI-Driven Development. It is an open-source way to build software with AI agents, by writing the important decisions down before any code exists.</p>
+
+        <h2>What BMAD is</h2>
+        <p>Most coding agents are handed a goal and asked to implement it. BMAD puts a method in front of that. The work covers the whole effort: what to build, how it holds together, and how it changes as you learn.</p>
+        <p>Specialized perspectives weigh in, in order. Product clarifies what is in scope. Architecture decides how it holds together. The person who will use the result shapes what they need to see. Development builds one piece at a time. Testing checks that the piece does what the decision said. Each of those leaves a document. The next step loads that document instead of guessing.</p>
+        <p>A later part of the method, the BMad Loop, can take the resulting stories and run the build without someone pasting the next command. It implements a story, checks that the tests pass, reviews the change, commits it, and moves on. When it cannot decide, it stops and asks.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 200" role="img" aria-labelledby="loop-title loop-desc">
+            <title id="loop-title">BMAD delivery loop</title>
+            <desc id="loop-desc">Clarify leads to Plan. Plan leads to Build and verify. Learn returns to Plan. A vague idea starts at Clarify, a clear idea at Plan, and a small change at Build.</desc>
+            <defs>
+              <marker id="arrow-loop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 1.2 L 9 5 L 0 8.8 Z" fill="var(--text-quiet)"></path>
+              </marker>
+              <marker id="arrow-learn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 1.2 L 9 5 L 0 8.8 Z" fill="var(--accent)"></path>
+              </marker>
+            </defs>
+            <text x="101" y="20" text-anchor="middle" fill="var(--text-quiet)" font-size="12">Vague idea</text>
+            <text x="355" y="20" text-anchor="middle" fill="var(--text-quiet)" font-size="12">Clear idea</text>
+            <text x="609" y="20" text-anchor="middle" fill="var(--text-quiet)" font-size="12">Small change</text>
+            <rect x="16" y="34" width="170" height="68" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="101" y="73" text-anchor="middle" fill="var(--text)" font-size="15">Clarify</text>
+            <rect x="270" y="34" width="170" height="68" fill="var(--bg)" stroke="var(--accent)"></rect>
+            <text x="355" y="73" text-anchor="middle" fill="var(--text)" font-size="15">Plan</text>
+            <rect x="524" y="34" width="170" height="68" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="609" y="66" text-anchor="middle" fill="var(--text)" font-size="15">Build and</text>
+            <text x="609" y="86" text-anchor="middle" fill="var(--text)" font-size="15">verify</text>
+            <line x1="186" y1="68" x2="262" y2="68" stroke="var(--text-quiet)" marker-end="url(#arrow-loop)"></line>
+            <line x1="440" y1="68" x2="516" y2="68" stroke="var(--text-quiet)" marker-end="url(#arrow-loop)"></line>
+            <path d="M 609 102 V 158 H 355 V 110" fill="none" stroke="var(--accent)" marker-end="url(#arrow-learn)"></path>
+            <text x="482" y="150" text-anchor="middle" fill="var(--accent)" font-size="12">Learn</text>
+          </svg>
+          <figcaption>A vague notion starts at Clarify. A clear idea starts at Plan. A small change starts at Build and verify. What you learn goes back into the plan.</figcaption>
+        </figure>
+        <dl class="roles">
+          <dt>BMAD</dt>
+          <dd>Breakthrough Method for Agile AI-Driven Development. Decisions stay explicit, context carries forward, and the amount of planning matches the size of the change.</dd>
+          <dt>BMad Loop</dt>
+          <dd>The unattended build cycle. A queue of stories goes in. Reviewed commits come out. A decision the loop cannot make becomes a stop.</dd>
+          <dt>The point</dt>
+          <dd>An agent implements whatever you left unstated. BMAD is the practice of not leaving the important parts unstated.</dd>
+        </dl>
+
+        <h2>Why it matters for GRC engineering</h2>
+        <p>GRC engineering turns an obligation into something a system can enforce and an assessor can trace. The pieces are ordinary: a named requirement, a check that can fail, a record of the result, and a catalog entry that uses the same words as the check.</p>
+        <p>That work is now often done with a coding agent. The agent is good at the check. It is careless about the decision the check depends on. Ask it to “add the control” and it will also invent which requirement applies, what a failure looks like, what gets stored as evidence, and who may accept an exception.</p>
+        <p>In a product feature, that guess becomes rework. In GRC engineering, the guess becomes proof. Someone later treats the green run as evidence that the requirement is met. If the requirement was never named, the evidence does not hold.</p>
+        <p>BMAD matters here because it keeps that decision in front of the code. You name the obligation, the fail case, the evidence, and the owner while they are still cheap to change. The agent builds against those words. When the loop stops, the question goes to the person who owns it: the control owner, the person who reads the evidence, or security. It does not get answered by whoever happens to be at the keyboard.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 292" role="img" aria-labelledby="grc-title grc-desc">
+            <title id="grc-title">Two paths from a control request to a result</title>
+            <desc id="grc-desc">Without a written decision, a prompt becomes an invented control and a green run treated as proof. With BMAD, a written decision becomes a check and a record an assessor can trace.</desc>
+            <defs>
+              <marker id="arrow-grc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 1.2 L 9 5 L 0 8.8 Z" fill="var(--text-quiet)"></path>
+              </marker>
+            </defs>
+            <text x="16" y="18" fill="var(--text-quiet)" font-size="12">Without a written decision</text>
+            <rect x="16" y="32" width="196" height="78" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="114" y="64" text-anchor="middle" fill="var(--text)" font-size="14">Prompt</text>
+            <text x="114" y="84" text-anchor="middle" fill="var(--text-quiet)" font-size="12">“add the control”</text>
+            <rect x="262" y="32" width="196" height="78" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="360" y="64" text-anchor="middle" fill="var(--text)" font-size="14">Agent invents</text>
+            <text x="360" y="84" text-anchor="middle" fill="var(--text-quiet)" font-size="12">the missing answers</text>
+            <rect x="508" y="32" width="196" height="78" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="606" y="64" text-anchor="middle" fill="var(--text)" font-size="14">Green run</text>
+            <text x="606" y="84" text-anchor="middle" fill="var(--text-quiet)" font-size="12">treated as proof</text>
+            <line x1="212" y1="71" x2="254" y2="71" stroke="var(--text-quiet)" marker-end="url(#arrow-grc)"></line>
+            <line x1="458" y1="71" x2="500" y2="71" stroke="var(--text-quiet)" marker-end="url(#arrow-grc)"></line>
+            <text x="16" y="154" fill="var(--accent)" font-size="12">With BMAD, the decision comes first</text>
+            <rect x="16" y="168" width="196" height="78" fill="var(--bg)" stroke="var(--accent)"></rect>
+            <text x="114" y="200" text-anchor="middle" fill="var(--text)" font-size="14">Written decision</text>
+            <text x="114" y="220" text-anchor="middle" fill="var(--text-quiet)" font-size="12">obligation, fail, owner</text>
+            <rect x="262" y="168" width="196" height="78" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="360" y="200" text-anchor="middle" fill="var(--text)" font-size="14">Agent builds</text>
+            <text x="360" y="220" text-anchor="middle" fill="var(--text-quiet)" font-size="12">only that decision</text>
+            <rect x="508" y="168" width="196" height="78" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="606" y="200" text-anchor="middle" fill="var(--text)" font-size="14">Traceable record</text>
+            <text x="606" y="220" text-anchor="middle" fill="var(--text-quiet)" font-size="12">check, evidence, catalog</text>
+            <line x1="212" y1="207" x2="254" y2="207" stroke="var(--text-quiet)" marker-end="url(#arrow-grc)"></line>
+            <line x1="458" y1="207" x2="500" y2="207" stroke="var(--text-quiet)" marker-end="url(#arrow-grc)"></line>
+          </svg>
+          <figcaption>The same request, two outcomes. The top path lets the agent invent the control. The bottom path writes the decision first, so the green run is evidence of that decision.</figcaption>
+        </figure>
+        <p class="quiet">This course is that translation. It is not tied to one framework, one pipeline, or one tool. The worked example is a privileged-access review, because the shape is easy to replay on any control you actually operate.</p>
+
+        <h2>What you will do</h2>
+        <dl class="roles">
+          <dt>Lesson 1</dt>
+          <dd>See the two ways a control fails, and the five answers that make a decision explicit.</dd>
+          <dt>Lesson 2</dt>
+          <dd>Learn the phases, choose a planning track by risk, and match each decision to an owner.</dd>
+          <dt>Lesson 3</dt>
+          <dd>Follow one requirement from a sentence in a policy to a check, a record, and a catalog entry.</dd>
+          <dt>Lesson 4</dt>
+          <dd>Route the stops a build loop raises, and leave with a checklist for the next change.</dd>
+        </dl>
+
+        <button class="chip next" type="button" data-go="1">Continue to why it matters</button>
+      </article>
+
+      <article class="lesson" id="lesson-1" data-lesson="1">
+        <p class="kicker">Lesson 1</p>
+        <h2 class="claim">An implicit<br>control does not<br>survive an audit.</h2>
+        <p class="lede">BMAD matters because a coding agent will implement whatever decision you left unstated. In GRC engineering, that fill-in becomes a control you cannot defend.</p>
+
+        <div class="split">
+          <div>
+            <h2 style="margin-top:0">The trade</h2>
+            <p>Spend the tokens before the code. Make the obligation, the fail case, the evidence, and the owner explicit while they are still cheap to change. Once a run is green and someone treats the record as proof, the same decision is expensive.</p>
+            <p class="quiet">The method’s order is clarify, plan, build and verify, then learn. Product, architecture, the evidence consumer, development, and testing weigh in before implementation starts.</p>
+          </div>
+          <div>
+            <h2 style="margin-top:0">Two familiar failures</h2>
+            <div class="five" style="margin-top:8px">
+              <div style="padding:14px 0;border-top:1px solid var(--line)">
+                <h3>In the policy only</h3>
+                <p class="quiet" style="margin:6px 0 0">The requirement is real. Nothing checks it, and nothing records when it holds or fails.</p>
+              </div>
+              <div style="padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+                <h3>In the system only</h3>
+                <p class="quiet" style="margin:6px 0 0">A check passes. Nobody wrote the obligation, the owner, the false pass, or where the evidence goes.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h2>Explicit means five answers</h2>
+        <p class="quiet">A later reader, human or agent, can answer these without guessing. A blank is the defect.</p>
+        <ol class="five">
+          <li><span class="n">1</span><div><strong>Obligation</strong><span>Which requirement, which framework, which system.</span></div></li>
+          <li><span class="n">2</span><div><strong>Intent</strong><span>What must pass, and what must fail.</span></div></li>
+          <li><span class="n">3</span><div><strong>Evidence</strong><span>What record proves it, where it lives, who can read it.</span></div></li>
+          <li><span class="n">4</span><div><strong>Owner</strong><span>Who accepts a scope change, an exception, or a residual risk.</span></div></li>
+          <li><span class="n">5</span><div><strong>Boundary</strong><span>What the agent may not do to get a green run. Invent an ID, weaken a check, log a secret, widen scope.</span></div></li>
+        </ol>
+        <p class="note">Autonomy is the loop taking the next story without you pasting a command. Reach is the stop arriving at the person who owns it. Fewer questions is not the goal. Unowned answers are.</p>
+
+        <h2>Check yourself</h2>
+        <div class="checks">
+          <details>
+            <summary><span class="q">1</span> Someone says “add encryption at rest and make the check pass.” Which of the five answers are still missing?</summary>
+            <p class="answer">Usually all five. The phrase names neither the requirement nor the system. It does not say what must fail. Evidence, owner, and the forbidden list are unstated, so the agent will fill them in.</p>
+          </details>
+          <details>
+            <summary><span class="q">2</span> Why is a wrong decision cheaper in a planning note than in a green run?</summary>
+            <p class="answer">In the note, the next phase simply loads a different decision. In a green run, that decision is already evidence and history someone may rely on.</p>
+          </details>
+          <details>
+            <summary><span class="q">3</span> The loop stops because the check needs a data store the spec never mentioned. Implementation detail, or scope?</summary>
+            <p class="answer">Scope. A new store changes what the system reads, what it keeps, and who owns the exposure. Naming a branch would be the implementation-detail version of a stop.</p>
+          </details>
+        </div>
+        <button class="chip next" type="button" data-go="2">Continue to the method</button>
+      </article>
+
+      <article class="lesson" id="lesson-2" data-lesson="2">
+        <p class="kicker">Lesson 2</p>
+        <h2 class="claim">Decisions travel<br>as documents,<br>not as chat.</h2>
+        <p class="lede">Each phase writes something the next phase loads. The agent is never asked to invent the previous decision. A small, already-decided change skips ahead to build.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 150" role="img" aria-labelledby="docs-title docs-desc">
+            <title id="docs-title">Documents each phase hands to the next</title>
+            <desc id="docs-desc">A brief from analysis loads into the PRD. The PRD loads into architecture. Architecture loads into one story, which is what implementation builds.</desc>
+            <defs>
+              <marker id="arrow-docs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 1.2 L 9 5 L 0 8.8 Z" fill="var(--text-quiet)"></path>
+              </marker>
+            </defs>
+            <rect x="16" y="16" width="150" height="92" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="91" y="52" text-anchor="middle" fill="var(--text)" font-size="15">Brief</text>
+            <text x="91" y="76" text-anchor="middle" fill="var(--text-quiet)" font-size="12">Analysis</text>
+            <rect x="198" y="16" width="150" height="92" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="273" y="52" text-anchor="middle" fill="var(--text)" font-size="15">PRD</text>
+            <text x="273" y="76" text-anchor="middle" fill="var(--text-quiet)" font-size="12">Planning</text>
+            <rect x="380" y="16" width="150" height="92" fill="var(--bg)" stroke="var(--accent)"></rect>
+            <text x="455" y="48" text-anchor="middle" fill="var(--text)" font-size="15">Architecture</text>
+            <text x="455" y="70" text-anchor="middle" fill="var(--text-quiet)" font-size="12">Solutioning</text>
+            <rect x="562" y="16" width="142" height="92" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="633" y="48" text-anchor="middle" fill="var(--text)" font-size="15">One story</text>
+            <text x="633" y="70" text-anchor="middle" fill="var(--text-quiet)" font-size="12">Implementation</text>
+            <line x1="166" y1="62" x2="190" y2="62" stroke="var(--text-quiet)" marker-end="url(#arrow-docs)"></line>
+            <line x1="348" y1="62" x2="372" y2="62" stroke="var(--text-quiet)" marker-end="url(#arrow-docs)"></line>
+            <line x1="530" y1="62" x2="554" y2="62" stroke="var(--text-quiet)" marker-end="url(#arrow-docs)"></line>
+          </svg>
+          <figcaption>Each box is context for the next. Implementation receives one story, not the whole conversation that produced it.</figcaption>
+        </figure>
+
+        <h2>Four phases</h2>
+        <div class="phases" role="group" aria-label="BMAD phases">
+          <button class="phase" type="button" data-phase="0" aria-pressed="true">
+            <span class="dot"></span>
+            <span class="pname">Analysis</span>
+            <span class="pmeta">Optional. Is the gap real?</span>
+          </button>
+          <button class="phase" type="button" data-phase="1" aria-pressed="false">
+            <span class="dot"></span>
+            <span class="pname">Planning</span>
+            <span class="pmeta">What must be true, for whom.</span>
+          </button>
+          <button class="phase" type="button" data-phase="2" aria-pressed="false">
+            <span class="dot"></span>
+            <span class="pname">Solutioning</span>
+            <span class="pmeta">Where it lives, in stories.</span>
+          </button>
+          <button class="phase" type="button" data-phase="3" aria-pressed="false">
+            <span class="dot"></span>
+            <span class="pname">Implementation</span>
+            <span class="pmeta">One story, then review.</span>
+          </button>
+        </div>
+        <div class="phase-detail" id="phase-detail"></div>
+
+        <h2>Pick a track by risk</h2>
+        <p class="quiet">A five-line edit that changes what a control proves is not a small change. Prefer this test over a story count.</p>
+        <div class="tracks" role="group" aria-label="Planning tracks">
+          <button class="chip" type="button" data-track="0" aria-pressed="true">Quick Flow</button>
+          <button class="chip" type="button" data-track="1" aria-pressed="false">BMad Method</button>
+          <button class="chip" type="button" data-track="2" aria-pressed="false">Enterprise</button>
+        </div>
+        <div class="track-body" id="track-body"></div>
+
+        <h2>Who owns the decision</h2>
+        <p class="quiet">The named agents are perspectives. One person may wear several, as long as the decision is written down. One chat playing all of them, with no record, is the failure.</p>
+        <dl class="roles">
+          <dt>Obligation</dt>
+          <dd>Which requirement, which system, what is out of scope, what “done” means for the person who will rely on the evidence.</dd>
+          <dt>Evidence consumer</dt>
+          <dd>Whether an assessor can tell pass from fail without reading the implementation.</dd>
+          <dt>Architecture</dt>
+          <dd>Where the check runs, what it may see, what it emits, and which choice would be expensive to reverse.</dd>
+          <dt>Sequencing</dt>
+          <dd>Stories small enough to review, ordered so a fail case exists before a green run is trusted.</dd>
+          <dt>Implementation</dt>
+          <dd>Code and tests that satisfy the story and do not widen it.</dd>
+          <dt>Proof</dt>
+          <dd>A pass case, a fail case, and the edge that would make a broken control look healthy.</dd>
+        </dl>
+
+        <h2>Check yourself</h2>
+        <div class="checks">
+          <details>
+            <summary><span class="q">1</span> The requirement, owner, and evidence location already exist. You are only stopping a false positive. Which track?</summary>
+            <p class="answer">Quick Flow. Write a short tech spec that cites the existing decision and names the case that must still fail.</p>
+          </details>
+          <details>
+            <summary><span class="q">2</span> A new requirement needs a check, a fail case, a run, and a catalog entry. Why is Quick Flow a poor fit?</summary>
+            <p class="answer">The meaning of the control is not in an artifact yet, and the change crosses several pieces. Quick Flow would let the agent choose the interpretation in code. Use the Method track. If you will show the result as assurance, add the enterprise notes.</p>
+          </details>
+          <details>
+            <summary><span class="q">3</span> Who owns the evidence layout, the place the check runs, and which requirement is in scope?</summary>
+            <p class="answer">The evidence consumer, the architect, and the obligation owner. Those are three decisions, even when one engineer is typing.</p>
+          </details>
+        </div>
+        <button class="chip next" type="button" data-go="3">Continue to apply it</button>
+      </article>
+
+      <article class="lesson" id="lesson-3" data-lesson="3">
+        <p class="kicker">Lesson 3 · a general change</p>
+        <h2 class="claim">Follow one<br>requirement<br>all the way<br>to proof.</h2>
+        <p class="lede">Privileged access must be reviewed on a fixed interval. Today that sentence lives in a policy. The work is a check that fails when a review is missing or stale, a record an assessor can read, and a catalog entry in the same words. The stack stays unnamed. Replay this shape on whatever you operate.</p>
+
+        <div class="pair">
+          <article>
+            <div class="tag">In scope</div>
+            <h3>The interval</h3>
+            <p class="quiet">Privileged accounts already in the system of record. A current review passes. A missing or stale review fails and names the account.</p>
+          </article>
+          <article>
+            <div class="tag">Out of scope</div>
+            <h3>The neighbors</h3>
+            <p class="quiet">Who counts as privileged. Granting or removing access. Multi-factor authentication. Leave those closed, or the agent will build them.</p>
+          </article>
+        </div>
+
+        <h2>The path</h2>
+        <p class="quiet">Select a step. The fail case comes before the check, so a broken control cannot pass by accident.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 168" role="img" aria-labelledby="proof-title proof-desc">
+            <title id="proof-title">One requirement followed to proof</title>
+            <desc id="proof-desc">A policy sentence becomes a fail case, then a check, then evidence, then a catalog entry. The check, the evidence, and the catalog use the same statement.</desc>
+            <defs>
+              <marker id="arrow-proof" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 1.2 L 9 5 L 0 8.8 Z" fill="var(--text-quiet)"></path>
+              </marker>
+            </defs>
+            <rect x="8" y="8" width="120" height="72" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="68" y="40" text-anchor="middle" fill="var(--text)" font-size="13">Policy</text>
+            <text x="68" y="58" text-anchor="middle" fill="var(--text-quiet)" font-size="11">the sentence</text>
+            <rect x="152" y="8" width="120" height="72" fill="var(--bg)" stroke="var(--accent)"></rect>
+            <text x="212" y="40" text-anchor="middle" fill="var(--text)" font-size="13">Fail case</text>
+            <text x="212" y="58" text-anchor="middle" fill="var(--text-quiet)" font-size="11">before the check</text>
+            <rect x="296" y="8" width="120" height="72" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="356" y="48" text-anchor="middle" fill="var(--text)" font-size="13">Check</text>
+            <rect x="440" y="8" width="120" height="72" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="500" y="48" text-anchor="middle" fill="var(--text)" font-size="13">Evidence</text>
+            <rect x="584" y="8" width="120" height="72" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="644" y="48" text-anchor="middle" fill="var(--text)" font-size="13">Catalog</text>
+            <line x1="128" y1="44" x2="144" y2="44" stroke="var(--text-quiet)" marker-end="url(#arrow-proof)"></line>
+            <line x1="272" y1="44" x2="288" y2="44" stroke="var(--text-quiet)" marker-end="url(#arrow-proof)"></line>
+            <line x1="416" y1="44" x2="432" y2="44" stroke="var(--text-quiet)" marker-end="url(#arrow-proof)"></line>
+            <line x1="560" y1="44" x2="576" y2="44" stroke="var(--text-quiet)" marker-end="url(#arrow-proof)"></line>
+            <path d="M 296 96 H 704" fill="none" stroke="var(--accent)"></path>
+            <path d="M 296 90 V 102 M 704 90 V 102" fill="none" stroke="var(--accent)"></path>
+            <text x="500" y="122" text-anchor="middle" fill="var(--accent)" font-size="12">Same statement in the check, the evidence, and the catalog</text>
+          </svg>
+          <figcaption>The fail case is fixed before the check exists. The last three boxes have to say the requirement the same way, or the catalog and the control drift apart.</figcaption>
+        </figure>
+        <ol class="steps" id="story-steps"></ol>
+        <p class="step-copy" id="story-copy"></p>
+
+        <h2>Readiness, before you build</h2>
+        <dl class="roles">
+          <dt>Pass</dt>
+          <dd>Requirement, non-goals, pass case, fail case, evidence fields, and an owner are written down.</dd>
+          <dt>Concerns</dt>
+          <dd>Proceed, and write the loose end into the story. Example: the interval’s timezone is still vague, so the check story must name it.</dd>
+          <dt>Fail</dt>
+          <dd>Stop. No owner for an exception, no fail case, or the word “access” standing in for a named requirement.</dd>
+        </dl>
+        <p class="note">Hand the loop the story queue. Do not hand it the sentence “automate access reviews.” A later one-line fix, once this decision exists, is Quick Flow and cites the requirement it still satisfies.</p>
+
+        <h2>Check yourself</h2>
+        <div class="checks">
+          <details>
+            <summary><span class="q">1</span> What does the agent build if granting and removing access are not marked out of scope?</summary>
+            <p class="answer">Provisioning, removal, and often ticketing. “Automate access reviews” is a wide phrase. The non-goals are what keep this a review-interval claim.</p>
+          </details>
+          <details>
+            <summary><span class="q">2</span> What do you lose by writing the check before the fail case?</summary>
+            <p class="answer">A picture of the miss that does not depend on the code you are about to write. Without it, a check can read the wrong date, or check nothing, and still look finished.</p>
+          </details>
+          <details>
+            <summary><span class="q">3</span> A break-glass account cannot show a review, and nobody owns that exception. Pass, concerns, or fail?</summary>
+            <p class="answer">Fail. An exception with no owner is permission to deviate that nobody holds. A timezone ambiguity is a concern. A missing owner is not.</p>
+          </details>
+        </div>
+        <button class="chip next" type="button" data-go="4">Continue to the human loop</button>
+      </article>
+
+      <article class="lesson" id="lesson-4" data-lesson="4">
+        <p class="kicker">Lesson 4</p>
+        <h2 class="claim">A stop is<br>a decision<br>looking for<br>its owner.</h2>
+        <p class="lede">The BMad Loop takes a queue of stories, implements each one, requires the tests to pass, reviews, and commits. It will stop. On one machine that stop reaches only the person at the keyboard. The control owner, the assessor, and the security reviewer never see the question that belongs to them.</p>
+
+        <h2>Where a stop goes</h2>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 292" role="img" aria-labelledby="stop-title stop-desc">
+            <title id="stop-title">How a loop stop is routed</title>
+            <desc id="stop-desc">A stop about a branch name continues with the implementer. A new system pauses for the obligation owner. An unreadable result pauses for the evidence consumer. Too much stored in evidence pauses for security.</desc>
+            <defs>
+              <marker id="arrow-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 1.2 L 9 5 L 0 8.8 Z" fill="var(--text-quiet)"></path>
+              </marker>
+            </defs>
+            <rect x="250" y="8" width="220" height="46" fill="var(--bg)" stroke="var(--accent)"></rect>
+            <text x="360" y="36" text-anchor="middle" fill="var(--text)" font-size="15">The loop stops</text>
+            <path d="M 360 54 V 78 H 96 V 100 M 360 78 H 272 V 100 M 360 78 H 448 V 100 M 360 78 H 624 V 100" fill="none" stroke="var(--line)"></path>
+            <rect x="16" y="100" width="160" height="64" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="96" y="128" text-anchor="middle" fill="var(--text)" font-size="13">Branch or file</text>
+            <text x="96" y="146" text-anchor="middle" fill="var(--text-quiet)" font-size="11">an implementation detail</text>
+            <rect x="192" y="100" width="160" height="64" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="272" y="128" text-anchor="middle" fill="var(--text)" font-size="13">New system</text>
+            <text x="272" y="146" text-anchor="middle" fill="var(--text-quiet)" font-size="11">not in the spec</text>
+            <rect x="368" y="100" width="160" height="64" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="448" y="128" text-anchor="middle" fill="var(--text)" font-size="13">Unreadable result</text>
+            <text x="448" y="146" text-anchor="middle" fill="var(--text-quiet)" font-size="11">no requirement name</text>
+            <rect x="544" y="100" width="160" height="64" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="624" y="128" text-anchor="middle" fill="var(--text)" font-size="13">Too much stored</text>
+            <text x="624" y="146" text-anchor="middle" fill="var(--text-quiet)" font-size="11">evidence or logs</text>
+            <line x1="96" y1="164" x2="96" y2="196" stroke="var(--text-quiet)" marker-end="url(#arrow-stop)"></line>
+            <line x1="272" y1="164" x2="272" y2="196" stroke="var(--text-quiet)" marker-end="url(#arrow-stop)"></line>
+            <line x1="448" y1="164" x2="448" y2="196" stroke="var(--text-quiet)" marker-end="url(#arrow-stop)"></line>
+            <line x1="624" y1="164" x2="624" y2="196" stroke="var(--text-quiet)" marker-end="url(#arrow-stop)"></line>
+            <rect x="16" y="204" width="160" height="68" fill="var(--bg-raise)" stroke="var(--line)"></rect>
+            <text x="96" y="232" text-anchor="middle" fill="var(--text)" font-size="13">Implementer</text>
+            <text x="96" y="252" text-anchor="middle" fill="var(--text-quiet)" font-size="12">Continues</text>
+            <rect x="192" y="204" width="160" height="68" fill="var(--bg)" stroke="var(--accent)"></rect>
+            <text x="272" y="232" text-anchor="middle" fill="var(--text)" font-size="13">Obligation owner</text>
+            <text x="272" y="252" text-anchor="middle" fill="var(--accent)" font-size="12">Pauses</text>
+            <rect x="368" y="204" width="160" height="68" fill="var(--bg)" stroke="var(--accent)"></rect>
+            <text x="448" y="232" text-anchor="middle" fill="var(--text)" font-size="13">Evidence consumer</text>
+            <text x="448" y="252" text-anchor="middle" fill="var(--accent)" font-size="12">Pauses</text>
+            <rect x="544" y="204" width="160" height="68" fill="var(--bg)" stroke="var(--accent)"></rect>
+            <text x="624" y="232" text-anchor="middle" fill="var(--text)" font-size="13">Security</text>
+            <text x="624" y="252" text-anchor="middle" fill="var(--accent)" font-size="12">Pauses</text>
+          </svg>
+          <figcaption>One kind of stop stays with the person running the loop. The other three wait until the owner of that decision writes the answer.</figcaption>
+        </figure>
+
+        <h2>Route this stop</h2>
+        <p class="quiet">Choose the owner. Implementation detail continues. The other three pause until that owner writes the answer.</p>
+        <div class="stops" id="stops"></div>
+
+        <h2>Before the next change</h2>
+        <ul class="play">
+          <li><input type="checkbox" id="c1"><label for="c1">Name the requirement and the system. Write what is out of scope.</label></li>
+          <li><input type="checkbox" id="c2"><label for="c2">Choose the track from the risk, not from how fast you want to start.</label></li>
+          <li><input type="checkbox" id="c3"><label for="c3">Load a constitution: evidence fields, fail closed, and the forbidden list.</label></li>
+          <li><input type="checkbox" id="c4"><label for="c4">Put a fail case in front of the implementation.</label></li>
+          <li><input type="checkbox" id="c5"><label for="c5">One story per session. Review it against the story, the decision, and the constitution.</label></li>
+          <li><input type="checkbox" id="c6"><label for="c6">Log every stop with a class and an owner. Resume only after a non-implementer decision is answered.</label></li>
+        </ul>
+        <p class="note">You would not accept a passing run that cannot name its requirement. Do not accept an agent session that cannot name it either.</p>
+
+        <h2>Learning resources</h2>
+        <p class="quiet">Use these when you want the source, or the longer written form of a lesson.</p>
+        <dl class="roles">
+          <dt>The method</dt>
+          <dd><a href="https://github.com/bmad-code-org/BMAD-METHOD">BMAD-METHOD</a>. The open-source framework: what the method is, and how to install it.</dd>
+          <dt>Phase map</dt>
+          <dd><a href="https://bmad-code-org-bmad-method-6.mintlify.app/reference/workflow-map">BMad workflow map</a>. Each phase, the workflow that runs it, and the document it produces.</dd>
+          <dt>The loop</dt>
+          <dd><a href="https://www.port.io/blog/bmad-method-explained">Port’s explainer of the BMad Loop</a>. The source for routing a stop to the person who owns that decision.</dd>
+          <dt>This course</dt>
+          <dd>
+            <a href="01-why-it-matters.md">Why it matters</a>,
+            <a href="02-the-method-translated.md">the method</a>,
+            <a href="03-apply-it.md">apply it</a>,
+            <a href="04-the-human-loop.md">the human loop</a>,
+            and the <a href="answer-key.md">answer key</a>.
+          </dd>
+        </dl>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    const phases = [
+      {
+        title: "Analysis",
+        body: "A short brief: the gap, the system, and the non-goals. Skip it when the requirement is already sharp. Use it to stop the agent from absorbing the neighboring controls."
+      },
+      {
+        title: "Planning",
+        body: "A PRD of conditions, not tasks. Functional: what passes and what fails. Non-functional: the evidence fields, who can read them, and the rule that the requirement is worded the same way in the check, the record, and the catalog."
+      },
+      {
+        title: "Solutioning",
+        body: "An architecture decision for the choice you do not want re-litigated, then stories. A readiness result of pass, concerns, or fail sits here, before anyone writes the check."
+      },
+      {
+        title: "Implementation",
+        body: "One story file, loaded clean. Implement only that story. Review whether the diff kept the requirement name, the fail case, and the non-goals. Then the next story."
+      }
+    ];
+
+    const tracks = [
+      {
+        name: "Quick Flow",
+        when: "The requirement is already written, the design does not change, and one person can hold the edit.",
+        use: "A false positive in a check you specified. A field the rule already requires. A threshold an owner already approved.",
+        artifact: "A tech spec that cites the existing decision and the case that must still fail."
+      },
+      {
+        name: "BMad Method",
+        when: "The requirement still needs alignment, a design choice will shape the code, or two agents could implement it differently.",
+        use: "One new control: fail case, check, run, evidence record, catalog entry.",
+        artifact: "Brief if you need it, then PRD, architecture, stories, and a readiness result."
+      },
+      {
+        name: "Enterprise",
+        when: "Someone outside the build will rely on this as assurance, a security review is mandatory, or more than one team will keep it.",
+        use: "A system newly in scope. A third-party assessment. Any control you will show an assessor.",
+        artifact: "The Method set, plus the security note, the compliance mapping, and a gate that blocks a story with no evidence."
+      }
+    ];
+
+    const stories = [
+      { name: "Fail case", meta: "First", copy: "A fixture has a privileged account with a stale review. A test expects a fail that names the account. The test may fail until the check exists. You can see the miss before the implementation can hide it." },
+      { name: "The check", meta: "Second", copy: "The check fails that fixture and passes a current review. The result includes the requirement name. It does not decide a new population or a new system." },
+      { name: "The run", meta: "Third", copy: "The check runs on the cadence you agreed, or in the delivery step you said it blocks. A fail is visible where you said it would be. The control is now an operating fact." },
+      { name: "Evidence", meta: "Fourth", copy: "A passing run writes a record: requirement, account identifier you agreed to store, result, and time. No credentials, no tokens, no full export of the identity system." },
+      { name: "Catalog", meta: "Last", copy: "The catalog entry uses the same sentence as the check and the evidence. The claim and the enforcement cannot drift inside one change." }
+    ];
+
+    const stops = [
+      {
+        prompt: "The loop wants to name the branch access-review-check.",
+        owner: "Implementer",
+        why: "File and branch names are implementation detail. Answer it and let the run continue."
+      },
+      {
+        prompt: "The only way to finish the story is to query a production system the spec never mentioned.",
+        owner: "Obligation owner",
+        why: "That is a new capability, and it exposes a new system. Pause. The obligation owner and security both answer before this story resumes. “We need it to finish” is not an answer."
+      },
+      {
+        prompt: "The fail message names an internal field and never names the requirement.",
+        owner: "Evidence consumer",
+        why: "An assessor cannot accept a result they cannot read. Pause for the person who consumes the evidence."
+      },
+      {
+        prompt: "The evidence writer wants a full export of every account, for context.",
+        owner: "Security or architecture",
+        why: "That changes what the system keeps and who can see it. Pause. The agreed evidence fields are the answer, written by that owner, not by the implementer."
+      }
+    ];
+
+    const owners = ["Implementer", "Obligation owner", "Evidence consumer", "Security or architecture"];
+
+    const phaseDetail = document.getElementById("phase-detail");
+    const trackBody = document.getElementById("track-body");
+    const storySteps = document.getElementById("story-steps");
+    const storyCopy = document.getElementById("story-copy");
+    const stopsEl = document.getElementById("stops");
+
+    function renderPhase(i) {
+      const p = phases[i];
+      phaseDetail.innerHTML =
+        '<div class="idx">0' + (i + 1) + '</div><div><h3>' + p.title + '</h3><p class="quiet">' + p.body + '</p></div>';
+      document.querySelectorAll(".phase").forEach((btn, n) => {
+        btn.setAttribute("aria-pressed", String(n === i));
+      });
+    }
+
+    function renderTrack(i) {
+      const t = tracks[i];
+      trackBody.innerHTML =
+        "<h3>" + t.name + "</h3>" +
+        '<p class="when">' + t.when + "</p>" +
+        "<p><strong>Use it for.</strong> " + t.use + "</p>" +
+        "<p><strong>You write.</strong> " + t.artifact + "</p>";
+      document.querySelectorAll(".chip").forEach((btn, n) => {
+        btn.setAttribute("aria-pressed", String(n === i));
+      });
+    }
+
+    function renderStory(i) {
+      storySteps.innerHTML = stories.map((s, n) =>
+        '<li class="' + (n === i ? "is-on" : "") + '">' +
+        '<span class="node"></span>' +
+        '<button class="step-btn" type="button" data-story="' + n + '">' +
+        "<strong>" + s.name + "</strong><em>" + s.meta + "</em></button></li>"
+      ).join("");
+      storyCopy.textContent = stories[i].copy;
+    }
+
+    function renderStops() {
+      stopsEl.innerHTML = stops.map((s, i) =>
+        '<div class="stop"><p>' + s.prompt + '</p><div class="choices">' +
+        owners.map((o) =>
+          '<button class="chip" type="button" data-stop="' + i + '" data-owner="' + o + '">' + o + "</button>"
+        ).join("") +
+        '</div><p class="feedback" id="fb-' + i + '" role="status"></p></div>'
+      ).join("");
+    }
+
+    document.querySelectorAll(".phase").forEach((btn) => {
+      btn.addEventListener("click", () => renderPhase(Number(btn.dataset.phase)));
+    });
+    document.querySelectorAll(".chip[data-track]").forEach((btn) => {
+      btn.addEventListener("click", () => renderTrack(Number(btn.dataset.track)));
+    });
+    storySteps.addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-story]");
+      if (!btn) return;
+      renderStory(Number(btn.dataset.story));
+    });
+    stopsEl.addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-stop]");
+      if (!btn) return;
+      const i = Number(btn.dataset.stop);
+      const fb = document.getElementById("fb-" + i);
+      const right = btn.dataset.owner === stops[i].owner;
+      fb.className = "feedback " + (right ? "ok" : "no");
+      fb.textContent = (right ? "Yes. " : "Not this owner. ") + stops[i].why;
+    });
+
+    function showLesson(id) {
+      document.querySelectorAll(".lesson").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.lesson === id);
+      });
+      document.querySelectorAll(".lesson-jump").forEach((j) => {
+        j.setAttribute("aria-current", j.dataset.go === id ? "true" : "false");
+      });
+      window.scrollTo(0, 0);
+    }
+
+    document.querySelectorAll(".lesson-jump").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        showLesson(btn.dataset.go);
+        history.replaceState(null, "", "#lesson-" + btn.dataset.go);
+      });
+    });
+
+    document.querySelectorAll(".chip.next").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        showLesson(btn.dataset.go);
+        history.replaceState(null, "", "#lesson-" + btn.dataset.go);
+      });
+    });
+
+    const fromHash = (location.hash.match(/lesson-(\d)/) || [])[1];
+    if (fromHash) showLesson(fromHash);
+
+    renderPhase(0);
+    renderTrack(0);
+    renderStory(0);
+    renderStops();
+  </script>
+</body>
+</html>
